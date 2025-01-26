@@ -58,8 +58,8 @@ wipefs "${part_home}"
 # Create new artitions
 mkfs.vfat -F32 "${part_boot}"
 # mkswap "${part_swap}"
-mkfs.ext4 -f "${part_root}"
-mkfs.ext4 -f "${part_home}"
+mkfs.ext4 "${part_root}"
+mkfs.ext4 "${part_home}"
 
 # swapon "${part_swap}"
 # mount "${part_root}" /mnt
