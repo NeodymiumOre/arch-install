@@ -40,8 +40,8 @@ timedatectl set-ntp true
 parted --script "${device}" -- mklabel gpt \
   mkpart ESP fat32 1Mib 321MiB \
   set 1 boot on \
-  mkpart primary ext4 321MiB 225GiB \
-  mkpart primary ext4 225GiB 100%
+  mkpart primary ext4 321MiB 50GiB \
+  mkpart primary ext4 50GiB 100%
 
 # Simple globbing was not enough as on one device I needed to match /dev/mmcblk0p1
 # but not /dev/mmcblk0boot1 while being able to match /dev/sda1 on other devices.
