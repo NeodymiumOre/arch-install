@@ -67,8 +67,8 @@ mkfs.ext4 "${part_home}"
 # mount "${part_boot}" /mnt/boot
 
 mount "${part_root}" /mnt
-mkdir -p /mnt/boot/efi
-mount "${part_boot}" /mnt/boot/efi
+mkdir -p /mnt/boot
+mount "${part_boot}" /mnt/boot
 mkdir /mnt/home
 mount "${part_home}" /mnt/home
 
@@ -77,7 +77,7 @@ pacstrap /mnt base linux linux-firmware
 # pacstrap /mnt mdaffin-desktop
 
 # ????
-genfstab -t PARTUUID /mnt >> /mnt/etc/fstab
+genfstab -U /mnt >> /mnt/etc/fstab
 echo "${hostname}" > /mnt/etc/hostname
 
 arch-chroot /mnt bootctl install
@@ -95,6 +95,7 @@ EOF
 
 ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
 hwclock --systohc
+# locale-gen
 
 echo "LANG=pl_PL.UTF-8" > /mnt/etc/locale.conf
 arch-chroot /mnt locale-gen
