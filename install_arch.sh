@@ -85,16 +85,16 @@ arch-chroot /mnt pacman -S grub efibootmgr
 arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-cat <<EOF > /mnt/boot/loader/loader.conf
-default arch
-EOF
+# cat <<EOF > /mnt/boot/loader/loader.conf
+# default arch
+# EOF
 
-cat <<EOF > /mnt/boot/loader/entries/arch.conf
-title    Arch Linux
-linux    /vmlinuz-linux
-initrd   /initramfs-linux.img
-options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
-EOF
+# cat <<EOF > /mnt/boot/loader/entries/arch.conf
+# title    Arch Linux
+# linux    /vmlinuz-linux
+# initrd   /initramfs-linux.img
+# options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
+# EOF
 
 ln -sf /mnt/usr/share/zoneinfo/Europe/Warsaw /mnt/etc/localtime
 arch-chroot /mnt hwclock --systohc
