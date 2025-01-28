@@ -3,8 +3,6 @@
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
-# REPO_URL="https://s3.eu-west-2.amazonaws.com/mdaffin-arch/repo/x86_64"
-
 ##### Get infomation from user
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
@@ -68,7 +66,8 @@ mkfs.ext4 "${part_home}"
 
 mount "${part_root}" /mnt
 mkdir -p /mnt/boot
-mount "${part_boot}" /mnt/boot
+mkdir -p /mnt/boot/efi
+mount "${part_boot}" /mnt/boot/efi
 mkdir /mnt/home
 mount "${part_home}" /mnt/home
 
@@ -82,6 +81,10 @@ echo "${hostname}" > /mnt/etc/hostname
 
 arch-chroot /mnt bootctl install
 
+arch-chroot /mnt pacman -S grub efibootmgr
+arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+
 cat <<EOF > /mnt/boot/loader/loader.conf
 default arch
 EOF
@@ -93,15 +96,15 @@ initrd   /initramfs-linux.img
 options  root=PARTUUID=$(blkid -s PARTUUID -o value "$part_root") rw
 EOF
 
-ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
-hwclock --systohc
-# locale-gen
+ln -sf /mnt/usr/share/zoneinfo/Europe/Warsaw /mnt/etc/localtime
+arch-chroot /mnt hwclock --systohc
 
-echo "LANG=pl_PL.UTF-8" > /mnt/etc/locale.conf
+arch-chroot /mnt echo "LANG=pl_PL.UTF-8" > /mnt/etc/locale.conf
 arch-chroot /mnt locale-gen
 
-arch-chroot /mnt useradd -mU -s /usr/bin/fish -G wheel,uucp,video,audio,storage,games,input "$user"
-arch-chroot /mnt chsh -s /usr/bin/fish
+# arch-chroot /mnt useradd -mU -s /usr/bin/fish -G wheel,uucp,video,audio,storage,games,input "$user"
+arch-chroot /mnt useradd -mU -G wheel,uucp,video,audio,storage,games,input "$user"
+# arch-chroot /mnt chsh -s /usr/bin/fish
 
 echo "$user:$password" | chpasswd --root /mnt
 echo "root:$password" | chpasswd --root /mnt
